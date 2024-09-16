@@ -40,5 +40,12 @@ release:
 			-ev $(EXTENSION_VERSION) \
 			-p $(DUCKDB_PLATFORM)
 
+
+test_debug: debug
+	echo "FIXME: we need to publish the unittest binary probably"
+
+test_release: release
+	echo "FIXME: we need to publish the unittest binary probably"
+
 clean:
 	cargo clean
