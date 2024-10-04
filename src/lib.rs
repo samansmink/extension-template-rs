@@ -11,7 +11,7 @@ use duckdb_loadable_macros::duckdb_entrypoint_c_api;
 use libduckdb_sys as ffi;
 use std::{
     error::Error,
-    ffi::{c_char, c_void, CString},
+    ffi::{c_char, CString},
 };
 
 #[repr(C)]
@@ -44,7 +44,7 @@ impl VTab for HelloVTab {
     type BindData = HelloBindData;
 
     unsafe fn bind(bind: &BindInfo, data: *mut HelloBindData) -> Result<(), Box<dyn std::error::Error>> {
-        bind.add_result_column("column0", LogicalTypeHandle::from(LogicalTypeId::Varchar));
+        bind.add_result_column("value", LogicalTypeHandle::from(LogicalTypeId::Varchar));
         let param = bind.get_parameter(0).to_string();
         unsafe {
             (*data).name = CString::new(param).unwrap().into_raw();
@@ -70,7 +70,7 @@ impl VTab for HelloVTab {
                 (*init_info).done = true;
                 let vector = output.flat_vector(0);
                 let name = CString::from_raw((*bind_info).name);
-                let result = CString::new(format!("Hello {}", name.to_str()?))?;
+                let result = CString::new(format!("Rusty Quack {} 🐥", name.to_str()?))?;
                 // Can't consume the CString
                 (*bind_info).name = CString::into_raw(name);
                 vector.insert(0, result);
@@ -87,7 +87,7 @@ impl VTab for HelloVTab {
 
 #[duckdb_entrypoint_c_api(ext_name = "rusty_quack", min_duckdb_version = "v0.0.1")]
 pub unsafe fn ExtensionEntrypoint(con: Connection) -> Result<(), Box<dyn Error>> {
-    con.register_table_function::<HelloVTab>("hello")
+    con.register_table_function::<HelloVTab>("rusty_quack")
         .expect("Failed to register hello table function");
     Ok(())
 }

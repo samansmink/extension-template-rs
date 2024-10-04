@@ -1,3 +1,5 @@
+PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
+
 ### Extension metadata params
 DUCKDB_PLATFORM=osx_arm64
 DUCKDB_VERSION=v0.0.1
@@ -14,14 +16,15 @@ ifneq ($(EXPLICIT_EXTENSION_VERSION),)
 endif
 
 ### Development options
-# TODO: this currently does not seem to work due to DuckDB-rs 1.1 not being published yet
 CARGO_OVERRIDE_DUCKDB_RS_FLAG?=
 ifneq ($(LOCAL_DUCKDB_RS_PATH),)
 	CARGO_OVERRIDE_DUCKDB_RS_FLAG=--config 'patch.crates-io.duckdb.path="$(LOCAL_DUCKDB_RS_PATH)/crates/duckdb"' --config 'patch.crates-io.libduckdb-sys.path="$(LOCAL_DUCKDB_RS_PATH)/crates/libduckdb-sys"' --config 'patch.crates-io.duckdb-loadable-macros-sys.path="$(LOCAL_DUCKDB_RS_PATH)/crates/duckdb-loadable-macros-sys"'
 endif
 
-debug:
+debug_lib:
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG)
+
+debug: debug_lib
 	python3 extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/debug/librusty_quack.dylib \
 			-o target/debug/rusty_quack.duckdb_extension \
@@ -30,8 +33,10 @@ debug:
 			-ev $(EXTENSION_VERSION) \
 			-p $(DUCKDB_PLATFORM)
 
-release:
+release_lib:
 	cargo build --release $(CARGO_OVERRIDE_DUCKDB_RS_FLAG)
+
+release: release_lib
 	python3 extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/release/librusty_quack.dylib \
 			-o target/release/rusty_quack.duckdb_extension \
@@ -41,11 +46,22 @@ release:
 			-p $(DUCKDB_PLATFORM)
 
 
-test_debug: debug
-	echo "FIXME: we need to publish the unittest binary probably"
+### Test options
+TEST_RUNNER_DEFAULT=echo "\nplease set DUCKDB_UNITTEST_BINARY to run tests"
+TEST_PARAMETERS=--test-dir $(PROJ_DIR) "test/sql/*"
+ifneq ($(DUCKDB_UNITTEST_BINARY),)
+	TEST_RUNNER_DEBUG=$(DUCKDB_UNITTEST_BINARY) --external-extension $(PROJ_DIR)target/debug/rusty_quack.duckdb_extension $(TEST_PARAMETERS)
+	TEST_RUNNER_RELEASE=$(DUCKDB_UNITTEST_BINARY) --external-extension $(PROJ_DIR)target/debug/rusty_quack.duckdb_extension $(TEST_PARAMETERS)
+else
+	TEST_RUNNER_DEBUG=$(TEST_RUNNER_DEFAULT)
+	TEST_RUNNER_RELEASE=$(TEST_RUNNER_DEFAULT)
+endif
 
-test_release: release
-	echo "FIXME: we need to publish the unittest binary probably"
+test_debug:
+	$(TEST_RUNNER_DEBUG)
+
+test_release:
+	$(TEST_RUNNER_RELEASE)
 
 clean:
 	cargo clean

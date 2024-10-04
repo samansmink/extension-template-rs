@@ -11,6 +11,7 @@ duckdb = { version = "1.0.0", features = ["vtab-loadable"] }
 duckdb-loadable-macros = "0.1.2"
 libduckdb-sys = { version = "1.0.0", features = ["loadable_extension"] }
 
+# TODO remove once published
 [patch.crates-io]
 duckdb = { path = "../duckdb-rs/crates/duckdb" }
 duckdb-loadable-macros = { path = "../duckdb-rs/crates/duckdb-loadable-macros" }

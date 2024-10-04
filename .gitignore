@@ -1,2 +1,3 @@
 /target
 .idea
+duckdb_unittest_tempdir
