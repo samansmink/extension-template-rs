@@ -45,17 +45,31 @@ release: release_lib
 			-ev $(EXTENSION_VERSION) \
 			-p $(DUCKDB_PLATFORM)
 
-
 ### Test options
-TEST_RUNNER_DEFAULT=echo "\nplease set DUCKDB_UNITTEST_BINARY to run tests"
-TEST_PARAMETERS=--test-dir $(PROJ_DIR) "test/sql/*"
-ifneq ($(DUCKDB_UNITTEST_BINARY),)
-	TEST_RUNNER_DEBUG=$(DUCKDB_UNITTEST_BINARY) --external-extension $(PROJ_DIR)target/debug/rusty_quack.duckdb_extension $(TEST_PARAMETERS)
-	TEST_RUNNER_RELEASE=$(DUCKDB_UNITTEST_BINARY) --external-extension $(PROJ_DIR)target/debug/rusty_quack.duckdb_extension $(TEST_PARAMETERS)
-else
-	TEST_RUNNER_DEBUG=$(TEST_RUNNER_DEFAULT)
-	TEST_RUNNER_RELEASE=$(TEST_RUNNER_DEFAULT)
+
+# this param is passed to the tester which will ensure these are installed
+# EXTRA_EXTENSIONS_PARAM=--preinstall-extensions json,icu TODO: enable once tester is distributed
+
+# Note: to override the default test runner, create a symlink to a different venv
+TEST_RUNNER=./venv/bin/python3 -m duckdb.sqllogictest
+
+TEST_RUNNER_BASE=$(TEST_RUNNER) --test-dir test/sql $(EXTRA_EXTENSIONS_PARAM)
+TEST_RUNNER_DEBUG=$(TEST_RUNNER_BASE) --external-extension target/debug/rusty_quack.duckdb_extension
+TEST_RUNNER_RELEASE=$(TEST_RUNNER_BASE) --external-extension target/release/rusty_quack.duckdb_extension
+
+# By default latest duckdb is installed, set DUCKDB_TEST_VERSION to switch to a different version
+DUCKDB_INSTALL_VERSION?=
+ifneq ($(DUCKDB_TEST_VERSION),)
+	DUCKDB_INSTALL_VERSION===$(DUCKDB_TEST_VERSION)
 endif
+
+# Installs the test runner (and duckdb itself)
+install_test_dependencies:
+	#TODO: enable once tester is distributed
+	ln -sf ../duckdb/venv venv
+#	 python3 -m venv venv
+#	./venv/bin/pip3 install 'duckdb$(DUCKDB_INSTALL_VERSION)'
+#	./venv/bin/python3 install_test_dependencies.py
 
 test_debug:
 	$(TEST_RUNNER_DEBUG)
@@ -65,3 +79,4 @@ test_release:
 
 clean:
 	cargo clean
+

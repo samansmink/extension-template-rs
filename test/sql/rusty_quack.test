@@ -11,6 +11,8 @@ Catalog Error: Scalar Function with name rusty_quack does not exist!
 # Require statement will ensure the extension is loaded from now on
 require rusty_quack
 
+require icu
+
 # Confirm the extension works
 query I
 SELECT * from rusty_quack('Sam');
