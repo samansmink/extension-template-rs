@@ -1,4 +1,4 @@
-.PHONY: clean test_debug test_release test debug release install_test_dependencies
+.PHONY: clean test_debug test_release test debug release install_test_dependencies all clean_test_dependencies
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -28,6 +28,8 @@ ifneq ($(LOCAL_DUCKDB_RS_PATH),)
 	CARGO_OVERRIDE_DUCKDB_RS_FLAG=--config 'patch.crates-io.duckdb.path="$(LOCAL_DUCKDB_RS_PATH)/crates/duckdb"' --config 'patch.crates-io.libduckdb-sys.path="$(LOCAL_DUCKDB_RS_PATH)/crates/libduckdb-sys"' --config 'patch.crates-io.duckdb-loadable-macros-sys.path="$(LOCAL_DUCKDB_RS_PATH)/crates/duckdb-loadable-macros-sys"'
 endif
 
+all: release
+
 # DEBUG build
 debug: target/debug/$(EXTENSION_FILENAME)
 
@@ -43,6 +45,12 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 			-ev $(EXTENSION_VERSION) \
 			-p $(DUCKDB_PLATFORM)
 
+build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
+	mkdir -p build/debug
+	cp target/debug/$(EXTENSION_LIB_FILENAME) build/debug/$(EXTENSION_FILENAME)
+
+debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME)
+
 # RELEASE build
 target/release/$(EXTENSION_LIB_FILENAME): src/*
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG) --release
@@ -56,7 +64,11 @@ target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 			-ev $(EXTENSION_VERSION) \
 			-p $(DUCKDB_PLATFORM)
 
-release: target/release/$(EXTENSION_FILENAME)
+build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
+	mkdir -p build/release
+	cp target/release/$(EXTENSION_LIB_FILENAME) build/release/$(EXTENSION_FILENAME)
+
+release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME)
 
 ### Test options
 
@@ -95,5 +107,8 @@ test_release: release
 
 clean:
 	cargo clean
+	rm -rf build
 	rm -rf duckdb_unittest_tempdir
 
+clean_test_dependencies:
+	rm -rf venv

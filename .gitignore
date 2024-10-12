@@ -1,4 +1,5 @@
 /target
+build
 .idea
 duckdb_unittest_tempdir
 /test/bin
