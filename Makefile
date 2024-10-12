@@ -46,8 +46,9 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 			-p $(DUCKDB_PLATFORM)
 
 build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
-	mkdir -p build/debug
+	mkdir -p build/debug/extension/$(EXTENSION_NAME)
 	cp target/debug/$(EXTENSION_LIB_FILENAME) build/debug/$(EXTENSION_FILENAME)
+	cp target/debug/$(EXTENSION_LIB_FILENAME) build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)
 
 debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME)
 
@@ -65,8 +66,9 @@ target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 			-p $(DUCKDB_PLATFORM)
 
 build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
-	mkdir -p build/release
+	mkdir -p build/release/extension/$(EXTENSION_NAME)
 	cp target/release/$(EXTENSION_LIB_FILENAME) build/release/$(EXTENSION_FILENAME)
+	cp target/release/$(EXTENSION_LIB_FILENAME) build/release/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)
 
 release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME)
 

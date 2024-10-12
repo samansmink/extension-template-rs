@@ -29,6 +29,7 @@ jobs:
       extension_name: rusty_quack
       extra_toolchains: rust
       matrix_parse_script: "./extension-ci-tools/scripts/modify_distribution_matrix.py"
+      exclude_archs: 'wasm_mvp;wasm_eh;wasm_threads;windows_amd64_rtools;windows_amd64'
 
   duckdb-stable-deploy:
     name: Deploy extension binaries
@@ -39,3 +40,4 @@ jobs:
       duckdb_version: v1.1.1
       extension_name: rusty_quack
       deploy_latest: ${{ startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' }}
+      exclude_archs: 'wasm_mvp;wasm_eh;wasm_threads;windows_amd64_rtools;windows_amd64'
