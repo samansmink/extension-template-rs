@@ -1,4 +1,4 @@
-.PHONY: clean test_debug test_release test debug release
+.PHONY: clean test_debug test_release test debug release install_test_dependencies
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -45,7 +45,7 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 
 # RELEASE build
 target/release/$(EXTENSION_LIB_FILENAME): src/*
-	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG)
+	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG) --release
 
 target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 	python3 extension-ci-tools/scripts/append_extension_metadata.py \
@@ -84,12 +84,14 @@ install_test_dependencies:
 	./venv/bin/python3 -m pip install ../duckdb-sqllogictest-py # TODO: replace with published package
 
 test_debug: debug
-	$(TEST_RUNNER_DEBUG)
+	@echo "Running DEBUG tests.."
+	@$(TEST_RUNNER_DEBUG)
 
 test: test_debug
 
 test_release: release
-	$(TEST_RUNNER_RELEASE)
+	@echo "Running RELEASE tests.."
+	@$(TEST_RUNNER_RELEASE)
 
 clean:
 	cargo clean
