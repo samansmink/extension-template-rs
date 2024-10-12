@@ -81,7 +81,7 @@ install_test_dependencies:
 	rm -rf venv
 	python3 -m venv venv
 	./venv/bin/python3 -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
-	./venv/bin/python3 -m pip install ../duckdb-sqllogictest-py # TODO: replace with published package
+	./venv/bin/python3 -m pip install  git+https://github.com/duckdb/duckdb-sqllogictest-python # TODO: replace with pypi package
 
 test_debug: debug
 	@echo "Running DEBUG tests.."
