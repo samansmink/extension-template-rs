@@ -120,3 +120,7 @@ set_duckdb_version: install_test_dependencies
 
 set_duckdb_tag:
 	@echo "NOP"
+
+output_distribution_matrix:
+	mkdir -p build
+	cp extension-ci-tools/config/distribution_matrix.json build/distribution_matrix.json
