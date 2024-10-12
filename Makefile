@@ -104,7 +104,7 @@ test_debug: debug
 	@echo "Running DEBUG tests.."
 	@$(TEST_RUNNER_DEBUG)
 
-test: test_debug
+test: test_release
 
 test_release: release
 	@echo "Running RELEASE tests.."
