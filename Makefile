@@ -87,6 +87,9 @@ DUCKDB_INSTALL_VERSION?=
 ifneq ($(DUCKDB_TEST_VERSION),)
 	DUCKDB_INSTALL_VERSION===$(DUCKDB_TEST_VERSION)
 endif
+ifneq ($(DUCKDB_GIT_VERSION),)
+	DUCKDB_INSTALL_VERSION===$(DUCKDB_GIT_VERSION)
+endif
 
 # Installs the test runner using the selected DuckDB version (latest stable by default)
 install_test_dependencies:
@@ -112,3 +115,8 @@ clean:
 
 clean_test_dependencies:
 	rm -rf venv
+
+set_duckdb_version: install_test_dependencies
+
+set_duckdb_tag:
+	@echo "NOP"
