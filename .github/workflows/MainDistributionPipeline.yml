@@ -27,7 +27,7 @@ jobs:
       duckdb_version: v1.1.1
       ci_tools_version: main
       extension_name: rusty_quack
-      extra_toolchains: rust
+      extra_toolchains: rust;python3
       matrix_parse_script: "./extension-ci-tools/scripts/modify_distribution_matrix.py"
       exclude_archs: 'wasm_mvp;wasm_eh;wasm_threads;windows_amd64_rtools;windows_amd64'
 

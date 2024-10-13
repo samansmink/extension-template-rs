@@ -18,8 +18,17 @@ ifneq ($(EXPLICIT_EXTENSION_VERSION),)
 	EXTENSION_VERSION = $(EXPLICIT_EXTENSION_VERSION)
 endif
 
-# TODO make platform independent
 EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+ifeq ($(UNAME_S),Linux)
+	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).so
+endif
+ifeq ($(UNAME_S),Darwin)
+	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+endif
+ifeq ($(OS),Windows_NT)
+	# TODO: how/what/where
+	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+endif
 EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
 
 ### Development options
