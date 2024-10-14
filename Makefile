@@ -2,23 +2,16 @@
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-### Basic config
 EXTENSION_NAME=rusty_quack
-ifeq ($(DUCKDB_PLATFORM),)
-	DUCKDB_PLATFORM = $(shell ./venv/bin/python3 -c "import duckdb;print(duckdb.execute('pragma platform').fetchone()[0])")
-endif
-ifeq ($(DUCKDB_VERSION),)
-	DUCKDB_VERSION = v0.0.1
-endif
-ifeq ($(EXTENSION_VERSION),)
-	EXTENSION_VERSION = v0.0.1
-endif
+
+PYTHON_BIN=python3
 
 # Platform specific config
 ifeq ($(OS),Windows_NT)
-	# TODO
-	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+	EXTENSION_LIB_FILENAME=$(EXTENSION_NAME).dll
+	PYTHON_VENV_BIN=./venv/Scripts/python3.exe
 else
+	PYTHON_VENV_BIN=./venv/bin/python3
     UNAME_S := $(shell uname -s)
     ifeq ($(UNAME_S),Linux)
         EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).so
@@ -26,6 +19,17 @@ else
     ifeq ($(UNAME_S),Darwin)
         EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
     endif
+endif
+
+### Basic config
+ifeq ($(DUCKDB_PLATFORM),)
+	DUCKDB_PLATFORM = $(shell $(PYTHON_VENV_BIN) -c "import duckdb;print(duckdb.execute('pragma platform').fetchone()[0])")
+endif
+ifeq ($(DUCKDB_VERSION),)
+	DUCKDB_VERSION = v0.0.1
+endif
+ifeq ($(EXTENSION_VERSION),)
+	EXTENSION_VERSION = v0.0.1
 endif
 
 EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
@@ -45,7 +49,7 @@ target/debug/$(EXTENSION_LIB_FILENAME): src/*
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG)
 
 target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
-	python3 extension-ci-tools/scripts/append_extension_metadata.py \
+	$(PYTHON_VENV_BIN) extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/debug/$(EXTENSION_LIB_FILENAME) \
 			-o target/debug/$(EXTENSION_FILENAME) \
 			-n $(EXTENSION_NAME) \
@@ -65,7 +69,7 @@ target/release/$(EXTENSION_LIB_FILENAME): src/*
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG) --release
 
 target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
-	python3 extension-ci-tools/scripts/append_extension_metadata.py \
+	$(PYTHON_VENV_BIN) extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/release/$(EXTENSION_LIB_FILENAME) \
 			-o target/release/$(EXTENSION_FILENAME) \
 			-n $(EXTENSION_NAME) \
@@ -86,7 +90,7 @@ release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME
 EXTRA_EXTENSIONS_PARAM=--preinstall-extensions icu,aws,json,vss
 
 # Note: to override the default test runner, create a symlink to a different venv
-TEST_RUNNER=./venv/bin/python3 -m duckdb_sqllogictest
+TEST_RUNNER=$(PYTHON_VENV_BIN) -m duckdb_sqllogictest
 
 TEST_RUNNER_BASE=$(TEST_RUNNER) --test-dir test/sql $(EXTRA_EXTENSIONS_PARAM)
 TEST_RUNNER_DEBUG=$(TEST_RUNNER_BASE) --external-extension target/debug/rusty_quack.duckdb_extension
@@ -104,9 +108,9 @@ endif
 # Installs the test runner using the selected DuckDB version (latest stable by default)
 install_dev_dependencies:
 	rm -rf venv
-	python3 -m venv venv
-	./venv/bin/python3 -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
-	./venv/bin/python3 -m pip install  git+https://github.com/duckdb/duckdb-sqllogictest-python # TODO: replace with pypi package
+	$(PYTHON_BIN) -m venv venv
+	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
+	$(PYTHON_VENV_BIN) -m pip install  git+https://github.com/duckdb/duckdb-sqllogictest-python # TODO: replace with pypi package
 
 test_debug: debug
 	@echo "Running DEBUG tests.."
