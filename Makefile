@@ -106,10 +106,12 @@ ifneq ($(DUCKDB_GIT_VERSION),)
 endif
 
 # Installs the test runner using the selected DuckDB version (latest stable by default)
+# TODO: switch to PyPI distribution
 install_dev_dependencies:
 	$(PYTHON_BIN) -m venv venv
 	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
-	$(PYTHON_VENV_BIN) -m pip install  git+https://github.com/duckdb/duckdb-sqllogictest-python # TODO: replace with pypi package
+	$(PYTHON_VENV_BIN) -m pip install ../duckdb-sqllogictest-py
+	#$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
 
 test_debug: debug
 	@echo "Running DEBUG tests.."
