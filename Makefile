@@ -107,6 +107,7 @@ endif
 
 # Installs the test runner using the selected DuckDB version (latest stable by default)
 # TODO: switch to PyPI distribution
+
 install_dev_dependencies:
 	$(PYTHON_BIN) -m venv venv
 	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
