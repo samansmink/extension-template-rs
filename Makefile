@@ -110,8 +110,7 @@ endif
 install_dev_dependencies:
 	$(PYTHON_BIN) -m venv venv
 	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
-	$(PYTHON_VENV_BIN) -m pip install ../duckdb-sqllogictest-py
-	#$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
+	$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
 
 test_debug: debug
 	@echo "Running DEBUG tests.."
