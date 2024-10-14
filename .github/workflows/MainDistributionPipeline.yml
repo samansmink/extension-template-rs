@@ -22,7 +22,7 @@ jobs:
 
   duckdb-stable-build:
     name: Build extension binaries
-    uses: samansmink/extension-ci-tools/.github/workflows/_extension_distribution.yml@fix-space-cleanup-step-when-no-imgs
+    uses: samansmink/extension-ci-tools/.github/workflows/_extension_distribution.yml@main
     with:
       duckdb_version: v1.1.1
       ci_tools_version: main
