@@ -9,7 +9,7 @@ PYTHON_BIN=python3
 # Platform specific config
 ifeq ($(OS),Windows_NT)
 	EXTENSION_LIB_FILENAME=$(EXTENSION_NAME).dll
-	PYTHON_VENV_BIN=./venv/Scripts/python3.exe
+	PYTHON_VENV_BIN=./venv/Scripts/python.exe
 else
 	PYTHON_VENV_BIN=./venv/bin/python3
     UNAME_S := $(shell uname -s)
@@ -58,7 +58,7 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 			-p $(DUCKDB_PLATFORM)
 
 build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
-	mkdir -p build/debug/extension/$(EXTENSION_NAME)
+	$(shell $(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/debug/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)")
 	cp target/debug/$(EXTENSION_LIB_FILENAME) build/debug/$(EXTENSION_FILENAME)
 	cp target/debug/$(EXTENSION_LIB_FILENAME) build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)
 
@@ -78,7 +78,7 @@ target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 			-p $(DUCKDB_PLATFORM)
 
 build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
-	mkdir -p build/release/extension/$(EXTENSION_NAME)
+	$(shell $(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/release/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)")
 	cp target/release/$(EXTENSION_LIB_FILENAME) build/release/$(EXTENSION_FILENAME)
 	cp target/release/$(EXTENSION_LIB_FILENAME) build/release/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)
 
@@ -107,7 +107,6 @@ endif
 
 # Installs the test runner using the selected DuckDB version (latest stable by default)
 install_dev_dependencies:
-	rm -rf venv
 	$(PYTHON_BIN) -m venv venv
 	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
 	$(PYTHON_VENV_BIN) -m pip install  git+https://github.com/duckdb/duckdb-sqllogictest-python # TODO: replace with pypi package
