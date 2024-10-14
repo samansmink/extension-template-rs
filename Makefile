@@ -1,4 +1,4 @@
-.PHONY: clean test_debug test_release test debug release install_dev_dependencies all clean_dev_dependencies
+.PHONY: clean test_debug test_release test debug release install_dev_dependencies all
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
@@ -62,7 +62,7 @@ build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/$(EXTENSION_FILENAME)')"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
-debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME)
+debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME) venv
 
 # RELEASE build
 target/release/$(EXTENSION_LIB_FILENAME): src/*
@@ -82,7 +82,7 @@ build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/release/$(EXTENSION_FILENAME)', 'build/release/$(EXTENSION_FILENAME)')"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
-release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME)
+release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME) venv
 
 ### Test options
 
@@ -108,7 +108,7 @@ endif
 # Installs the test runner using the selected DuckDB version (latest stable by default)
 # TODO: switch to PyPI distribution
 
-install_dev_dependencies:
+venv:
 	$(PYTHON_BIN) -m venv venv
 	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
 	$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
@@ -131,7 +131,9 @@ clean:
 clean_dev_dependencies:
 	rm -rf venv
 
-set_duckdb_version: install_dev_dependencies
+# TODO: this is now broken?
+set_duckdb_version:
+	@echo "NOP"
 
 set_duckdb_tag:
 	@echo "NOP"
