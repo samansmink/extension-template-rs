@@ -1,34 +1,33 @@
-.PHONY: clean test_debug test_release test debug release install_test_dependencies all clean_test_dependencies
+.PHONY: clean test_debug test_release test debug release install_dev_dependencies all clean_dev_dependencies
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-### Extension metadata params
-DUCKDB_PLATFORM=osx_arm64
-DUCKDB_VERSION=v0.0.1
-EXTENSION_VERSION=v0.0.1
+### Basic config
 EXTENSION_NAME=rusty_quack
+ifeq ($(DUCKDB_PLATFORM),)
+	DUCKDB_PLATFORM = $(shell ./venv/bin/python3 -c "import duckdb;print(duckdb.execute('pragma platform').fetchone()[0])")
+endif
+ifeq ($(DUCKDB_VERSION),)
+	DUCKDB_VERSION = v0.0.1
+endif
+ifeq ($(EXTENSION_VERSION),)
+	EXTENSION_VERSION = v0.0.1
+endif
 
-ifneq ($(DUCKDB_EXPLICIT_PLATFORM),)
-	DUCKDB_PLATFORM = $(DUCKDB_EXPLICIT_PLATFORM)
-endif
-ifneq ($(DUCKDB_EXPLICIT_VERSION),)
-	DUCKDB_VERSION = $(DUCKDB_EXPLICIT_VERSION)
-endif
-ifneq ($(EXPLICIT_EXTENSION_VERSION),)
-	EXTENSION_VERSION = $(EXPLICIT_EXTENSION_VERSION)
-endif
-
-EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
-ifeq ($(UNAME_S),Linux)
-	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).so
-endif
-ifeq ($(UNAME_S),Darwin)
-	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
-endif
+# Platform specific config
 ifeq ($(OS),Windows_NT)
-	# TODO: how/what/where
+	# TODO
 	EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+else
+    UNAME_S := $(shell uname -s)
+    ifeq ($(UNAME_S),Linux)
+        EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).so
+    endif
+    ifeq ($(UNAME_S),Darwin)
+        EXTENSION_LIB_FILENAME=lib$(EXTENSION_NAME).dylib
+    endif
 endif
+
 EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
 
 ### Development options
@@ -103,7 +102,7 @@ ifneq ($(DUCKDB_GIT_VERSION),)
 endif
 
 # Installs the test runner using the selected DuckDB version (latest stable by default)
-install_test_dependencies:
+install_dev_dependencies:
 	rm -rf venv
 	python3 -m venv venv
 	./venv/bin/python3 -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
@@ -124,10 +123,10 @@ clean:
 	rm -rf build
 	rm -rf duckdb_unittest_tempdir
 
-clean_test_dependencies:
+clean_dev_dependencies:
 	rm -rf venv
 
-set_duckdb_version: install_test_dependencies
+set_duckdb_version: install_dev_dependencies
 
 set_duckdb_tag:
 	@echo "NOP"
