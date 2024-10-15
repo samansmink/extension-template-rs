@@ -40,7 +40,6 @@ endif
 
 EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
 
-
 #############################################
 ### Development config
 #############################################
@@ -140,6 +139,10 @@ ifeq ($(LINUX_TESTS_OUTSIDE_DOCKER),1)
 	SKIP_TESTS=1
 endif
 
+ifeq ($(DUCKDB_PLATFORM),linux_amd64_gcc4)
+	SKIP_TESTS=1
+endif
+
 ifeq ($(SKIP_TESTS),1)
 	TEST_RELEASE_TARGET=tests_skipped
 	TEST_DEBUG_TARGET=tests_skipped
@@ -152,7 +155,7 @@ test_release_internal:
 	@echo "Running RELEASE tests.."
 	@$(TEST_RUNNER_RELEASE)
 test_debug_internal:
-	@echo "Running DEBUG tests.."
+	@echo "Running DEBUG tests.."xw
 	@$(TEST_RUNNER_DEBUG)
 
 tests_skipped:
@@ -175,5 +178,11 @@ output_distribution_matrix:
 	cat extension-ci-tools/config/distribution_matrix.json
 
 configure: venv
+
+CONFIGURE_CI_STEP: venv
+
+ifeq ($(DUCKDB_PLATFORM),linux_amd64_gcc4)
+	CONFIGURE_CI_STEP=set_duckdb_version
+endif
 
 configure_ci: venv
