@@ -62,7 +62,7 @@ build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/$(EXTENSION_FILENAME)')"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
-debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME) venv
+debug: venv target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME)
 
 # RELEASE build
 target/release/$(EXTENSION_LIB_FILENAME): src/*
@@ -82,7 +82,7 @@ build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/release/$(EXTENSION_FILENAME)', 'build/release/$(EXTENSION_FILENAME)')"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
-release: target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME) venv
+release: venv target/release/$(EXTENSION_FILENAME) build/release/$(EXTENSION_FILENAME)
 
 ### Test options
 
