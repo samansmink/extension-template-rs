@@ -1,6 +1,23 @@
 # DuckDB Rust extension template
 This is an experimental template for Rust based extensions based on the C Extension API of DuckDB.
 
+## Cloning
+
+Clone the repo with submodules
+
+```shell
+git clone --recurse-submodules <repo>
+```
+
+## Venv
+
+This template assumes you are using a venv called `venv`. If you are using uv, 
+
+```shell
+uv venv venv
+source venv/bin/activate
+```
+
 ## Building
 Building is simple just ensure Rust is installed, then run
 ```shell
