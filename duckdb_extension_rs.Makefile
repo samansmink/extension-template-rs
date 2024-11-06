@@ -4,7 +4,7 @@
 #   EXTENSION_NAME : name of the extension (lower case)
 #   DUCKDB_VERSION : the minimum version of DuckDB that the extension supports
 
-.PHONY: clean test_debug test_release test debug release install_dev_dependencies all platform
+.PHONY: clean test_debug test_release test debug release install_dev_dependencies all platform check_configure
 
 # TODO: move this files to extension-ci-tools when ready-ish
 
@@ -100,7 +100,7 @@ debug: target/debug/$(EXTENSION_FILENAME)
 target/debug/$(EXTENSION_LIB_FILENAME): src/*
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG)
 
-target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
+target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME) check_configure
 	$(PYTHON_VENV_BIN) extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/debug/$(EXTENSION_LIB_FILENAME) \
 			-o target/debug/$(EXTENSION_FILENAME) \
@@ -109,7 +109,7 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 			-ev $(EXTENSION_VERSION) \
 			-pf build/platform.txt
 
-build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
+build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME) check_configure
 	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/debug/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/$(EXTENSION_FILENAME)')"
 	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('target/debug/$(EXTENSION_FILENAME)', 'build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
@@ -120,7 +120,7 @@ debug: target/debug/$(EXTENSION_FILENAME) build/debug/$(EXTENSION_FILENAME)
 target/release/$(EXTENSION_LIB_FILENAME): src/*
 	cargo build $(CARGO_OVERRIDE_DUCKDB_RS_FLAG) --release
 
-target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
+target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME) check_configure
 	$(PYTHON_VENV_BIN) extension-ci-tools/scripts/append_extension_metadata.py \
 			-l target/release/$(EXTENSION_LIB_FILENAME) \
 			-o target/release/$(EXTENSION_FILENAME) \
@@ -188,10 +188,11 @@ endif
 test_release: $(TEST_RELEASE_TARGET)
 test_debug: $(TEST_DEBUG_TARGET)
 
-test_release_internal:
+test_release_internal: check_configure
 	@echo "Running RELEASE tests.."
 	@$(TEST_RUNNER_RELEASE)
-test_debug_internal:
+
+test_debug_internal: check_configure
 	@echo "Running DEBUG tests.."
 	@$(TEST_RUNNER_DEBUG)
 
@@ -239,3 +240,7 @@ else
 endif
 
 configure_ci: $(CONFIGURE_CI_STEP)
+
+check_configure:
+	$(PYTHON_BIN) -c "import os; assert os.path.exists('build/platform.txt'), 'The configure step appears to not be run. Please try running make configure'"
+	$(PYTHON_BIN) -c "import os; assert os.path.exists('venv'), 'The configure step appears to not be run. Please try running make configure'"
