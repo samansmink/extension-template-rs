@@ -87,11 +87,6 @@ jobs:
           fetch-depth: 0
           submodules: 'true'
 
-      - name: Checkout DuckDB to version
-        run: |
-          cd duckdb
-          git checkout ${{ inputs.duckdb_version }}
-
       - uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.extension_name }}-${{ inputs.duckdb_version }}-extension-${{matrix.duckdb_arch}}${{inputs.artifact_postfix}}${{startsWith(matrix.duckdb, 'wasm') && '.wasm' || ''}}
@@ -109,11 +104,7 @@ jobs:
         run: |
           pwd
           python3 -m pip install pip awscli
-          git config --global --add safe.directory '*'
-          cd duckdb
-          git fetch --tags
-          export DUCKDB_VERSION=`git tag --points-at HEAD`
-          export DUCKDB_VERSION=${DUCKDB_VERSION:=`git log -1 --format=%h`}
+          export DUCKDB_VERSION=${{ inputs.duckdb_version }}
           cd ..
           git fetch --tags
           export EXT_VERSION=`git tag --points-at HEAD`
