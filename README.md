@@ -9,62 +9,47 @@ Clone the repo with submodules
 git clone --recurse-submodules <repo>
 ```
 
-## Venv
+### Dependencies
+In principle, these extensions can be compiled with the Rust toolchain alone. However, this template relies on some additional
+tooling to make life a little easier and to be able to share CI/CD infrastructure with extension templates for other languages:
 
-This template assumes you are using a venv called `venv`. If you are using uv, 
+- python3
+- python3-venv
+- [Make](https://www.gnu.org/software/make)
 
-```shell
-uv venv venv
-source venv/bin/activate
-```
+Installing these dependencies will vary per platform:
+- For Linux, these come generally pre-installed or are available through the distro-specific package manager.
+- For MacOS, [homebrew](https://formulae.brew.sh/) is your answer.
+- For Windows, [chocolatey](https://community.chocolatey.org/) comes recommended.
 
 ## Building
-Building is simple just ensure Rust is installed, then run
+After installing the dependencies, building is a two-step process. Firstly run:
 ```shell
 make configure
 ```
+This will ensure a Python venv is set up with DuckDB and DuckDB's test runner installed. Additionally, depending on configuration,
+DuckDB will be used to determine the correct platform for which you are compiling.
 
+Then, to build the extension run:
 ```shell
 make debug
 ```
-or
-```shell
-make release
-```
+This delegates the build process to cargo, which will produce a shared library in `target/debug/<shared_lib_name>`. After this step, 
+a script is run to transform the shared library into a loadable extension by appending a binary footer. The resulting extension is written
+to the `build/debug` directory.
 
-### Dependencies
-In essence, this extension only requires Cargo to compile.
-
-However, to make life as a developer a bit easier, this extension relies on a combination of Make, Python 3 and Pip to ease the
-building and testing process.
+To create optimized release binaries, simply run `make release` instead.
 
 ## Testing
-This extension uses the DuckDB Python client for testing
-
-The `make configure` step will automatically install DuckDB. This means that after running `make configure` and `make debug`, running the 
-tests is as simple as `make test_debug`.
-
-To test your extension against 
-
-### Step 1
-- creates a local python3 venv
-- installs DuckDB into the venv
-- installs the test extension dependencies by running `install_test_dependencies.py`
-```sh
-make install_test_dependencies
-```
-Alternatively, a specific duckdb version can be chosen
-```shell
-DUCKDB_TEST_VERSION=v1.0.0 make install_test_dependencies
-```
-
-### Step 2
-Run the tests!
+This extension uses the DuckDB Python client for testing. This should be automatically installed in the `make configure` step.
+The tests themselves are written in the SQLLogicTest format, just like most of DuckDB's tests. A sample test can be found in
+`test/sql/<extension_name>.test`. To run the tests using the *debug* build:
 
 ```shell
 make test_debug
 ```
-or 
+
+or for the *release* build:
 ```shell
 make test_release
 ```
