@@ -102,7 +102,6 @@ jobs:
           pwd
           python3 -m pip install pip awscli
           export DUCKDB_VERSION=${{ inputs.duckdb_version }}
-          cd ..
           git fetch --tags
           export EXT_VERSION=`git tag --points-at HEAD`
           export EXT_VERSION=${EXT_VERSION:=`git log -1 --format=%h`}
