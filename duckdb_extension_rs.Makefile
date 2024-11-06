@@ -2,8 +2,9 @@
 #
 # Inputs
 #   EXTENSION_NAME : name of the extension (lower case)
+#   DUCKDB_VERSION : the minimum version of DuckDB that the extension supports
 
-.PHONY: clean test_debug test_release test debug release install_dev_dependencies all
+.PHONY: clean test_debug test_release test debug release install_dev_dependencies all platform
 
 #############################################
 ### Platform dependent config
@@ -185,7 +186,7 @@ test_release_internal:
 	@echo "Running RELEASE tests.."
 	@$(TEST_RUNNER_RELEASE)
 test_debug_internal:
-	@echo "Running DEBUG tests.."xw
+	@echo "Running DEBUG tests.."
 	@$(TEST_RUNNER_DEBUG)
 
 tests_skipped:
