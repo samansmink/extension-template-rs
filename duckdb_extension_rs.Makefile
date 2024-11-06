@@ -120,7 +120,7 @@ target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 			-n $(EXTENSION_NAME) \
 			-dv $(DUCKDB_VERSION) \
 			-ev $(EXTENSION_VERSION) \
-            -pf build/platform.txt
+			-pf build/platform.txt
 
 build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/release/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)"
