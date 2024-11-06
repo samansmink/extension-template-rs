@@ -6,6 +6,8 @@
 
 .PHONY: clean test_debug test_release test debug release install_dev_dependencies all platform
 
+# TODO: move this files to extension-ci-tools when ready-ish
+
 #############################################
 ### Platform dependent config
 #############################################
