@@ -300,26 +300,38 @@ jobs:
           restore-keys: |
             ccache-extension-distribution-${{ matrix.duckdb_arch }}-
 
-      - name: Run configure CI
+      - name: Run configure CI (outside Docker)
         shell: bash
+        env:
+          DUCKDB_GIT_VERSION: ${{ inputs.duckdb_version }}
+        run: |
+          make configure_ci
+
+      - name: Run configure CI (inside Docker)
+        shell: bash
+        env:
+          LINUX_CI_IN_DOCKER: 1
         run: |
           docker run --env-file=docker_env.txt -v `pwd`:/duckdb_build_dir -v `pwd`/ccache_dir:/ccache_dir duckdb/${{ matrix.duckdb_arch }} make configure_ci
 
-      - name: Build extension
+      - name: Build extension (inside Docker)
+        env:
+          LINUX_CI_IN_DOCKER: 1
         run: |
           docker run --env-file=docker_env.txt -v `pwd`:/duckdb_build_dir -v `pwd`/ccache_dir:/ccache_dir duckdb/${{ matrix.duckdb_arch }} make release
 
       - name: Test extension (inside docker)
         if: ${{ matrix.duckdb_arch != 'linux_arm64' && inputs.skip_tests == false }}
         env:
-          LINUX_TESTS_IN_DOCKER: 1
+          LINUX_CI_IN_DOCKER: 1
         run: |
           docker run --env-file=docker_env.txt -v `pwd`:/duckdb_build_dir -v `pwd`/ccache_dir:/ccache_dir duckdb/${{ matrix.duckdb_arch }} make test_release
 
       - name: Test extension (outside docker)
         if: ${{ matrix.duckdb_arch != 'linux_arm64' && inputs.skip_tests == false }}
         env:
-          LINUX_TESTS_OUTSIDE_DOCKER: 1
+          DUCKDB_GIT_VERSION: ${{ inputs.duckdb_version }}
+          LINUX_CI_IN_DOCKER: 1
         run: |
           make test_release
 

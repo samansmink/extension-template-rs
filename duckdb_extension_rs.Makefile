@@ -25,20 +25,52 @@ else
 endif
 
 #############################################
+### CI specific
+#############################################
+
+# TODO: do we need Python in Docker?
+ifeq ($(LINUX_CI_IN_DOCKER),1)
+    PYTHON_VENV_BIN=python3
+endif
+
+#############################################
 ### Main extension parameters
 #############################################
 
-ifeq ($(DUCKDB_PLATFORM),)
-	DUCKDB_PLATFORM = $(shell $(PYTHON_VENV_BIN) -c "import duckdb;print(duckdb.execute('pragma platform').fetchone()[0])")
-endif
+# The minimum DuckDB version that this extension supports
 ifeq ($(DUCKDB_VERSION),)
 	DUCKDB_VERSION = v0.0.1
 endif
+
 ifeq ($(EXTENSION_VERSION),)
 	EXTENSION_VERSION = v0.0.1
 endif
 
 EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
+
+#############################################
+### Platform Detection
+#############################################
+ifeq ($(DUCKDB_PLATFORM),)
+    PLATFORM_TARGET=platform_autodetect
+else
+	PLATFORM_TARGET=platform_override
+endif
+
+# Write the platform we are building for
+platform: build/platform
+
+build/platform: $(PLATFORM_TARGET)
+
+# (Don't call directly) autodetects the platform using the DuckDB installed in the venv
+platform_autodetect:
+	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/').mkdir(parents=True, exist_ok=True)"
+	$(PYTHON_VENV_BIN) -c "import duckdb;print(duckdb.execute('pragma platform').fetchone()[0])" > build/platform.txt
+
+# (Don't call directly) sets the platform using DUCKDB_PLATFORM variable
+platform_override:
+	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/').mkdir(parents=True, exist_ok=True)"
+	echo $(DUCKDB_PLATFORM) > build/platform.txt
 
 #############################################
 ### Development config
@@ -68,7 +100,7 @@ target/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 			-n $(EXTENSION_NAME) \
 			-dv $(DUCKDB_VERSION) \
 			-ev $(EXTENSION_VERSION) \
-			-p $(DUCKDB_PLATFORM)
+			-pf build/platform.txt
 
 build/debug/$(EXTENSION_FILENAME): target/debug/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/debug/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)"
@@ -88,7 +120,7 @@ target/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 			-n $(EXTENSION_NAME) \
 			-dv $(DUCKDB_VERSION) \
 			-ev $(EXTENSION_VERSION) \
-			-p $(DUCKDB_PLATFORM)
+            -pf build/platform.txt
 
 build/release/$(EXTENSION_FILENAME): target/release/$(EXTENSION_LIB_FILENAME)
 	$(PYTHON_VENV_BIN) -c "from pathlib import Path;Path('./build/release/extension/$(EXTENSION_NAME)').mkdir(parents=True, exist_ok=True)"
@@ -116,16 +148,11 @@ DUCKDB_INSTALL_VERSION?=
 ifneq ($(DUCKDB_TEST_VERSION),)
 	DUCKDB_INSTALL_VERSION===$(DUCKDB_TEST_VERSION)
 endif
+
+# TODO: I'm not 100% this is correct right now: we have a test version and a minimum target version: these are independent-ish
 ifneq ($(DUCKDB_GIT_VERSION),)
 	DUCKDB_INSTALL_VERSION===$(DUCKDB_GIT_VERSION)
 endif
-
-# Installs the test runner using the selected DuckDB version (latest stable by default)
-# TODO: switch to PyPI distribution
-venv:
-	$(PYTHON_BIN) -m venv venv
-	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
-	$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
 
 # Main tests
 test: test_release
@@ -135,7 +162,7 @@ TEST_DEBUG_TARGET=test_debug_internal
 TEST_RELDEBUG_TARGET=test_reldebug_internal
 
 # Disable testing outside docker: the unittester is currently dynamically linked by default
-ifeq ($(LINUX_TESTS_OUTSIDE_DOCKER),1)
+ifeq ($(LINUX_CI_IN_DOCKER),1)
 	SKIP_TESTS=1
 endif
 
@@ -167,22 +194,38 @@ clean:
 	rm -rf duckdb_unittest_tempdir
 	rm -rf venv
 
-# TODO: this is now broken?
-set_duckdb_version:
+nop:
 	@echo "NOP"
 
-set_duckdb_tag:
-	@echo "NOP"
+set_duckdb_version: nop
+
+set_duckdb_tag: nop
 
 output_distribution_matrix:
 	cat extension-ci-tools/config/distribution_matrix.json
 
-configure: venv
+#############################################
+### Python
+#############################################
 
-CONFIGURE_CI_STEP: venv
+# Installs the test runner using the selected DuckDB version (latest stable by default)
+# TODO: switch to PyPI distribution
+venv:
+	$(PYTHON_BIN) -m venv venv
+	$(PYTHON_VENV_BIN) -m pip install 'duckdb$(DUCKDB_INSTALL_VERSION)'
+	$(PYTHON_VENV_BIN) -m pip install git+https://github.com/duckdb/duckdb-sqllogictest-python
 
-ifeq ($(DUCKDB_PLATFORM),linux_amd64_gcc4)
-	CONFIGURE_CI_STEP=set_duckdb_version
+#############################################
+### Configure
+#############################################
+
+configure: venv platform
+
+CONFIGURE_CI_STEP?=
+ifeq ($(LINUX_CI_IN_DOCKER),1)
+	CONFIGURE_CI_STEP=nop
+else
+	CONFIGURE_CI_STEP=configure
 endif
 
-configure_ci: venv
+configure_ci: $(CONFIGURE_CI_STEP)

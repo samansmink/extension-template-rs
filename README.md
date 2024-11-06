@@ -4,6 +4,10 @@ This is an experimental template for Rust based extensions based on the C Extens
 ## Building
 Building is simple just ensure Rust is installed, then run
 ```shell
+make configure
+```
+
+```shell
 make debug
 ```
 or
@@ -11,8 +15,19 @@ or
 make release
 ```
 
+### Dependencies
+In essence, this extension only requires Cargo to compile.
+
+However, to make life as a developer a bit easier, this extension relies on a combination of Make, Python 3 and Pip to ease the
+building and testing process.
+
 ## Testing
-This extension uses the DuckDB Python client. This client ships with a test runner.
+This extension uses the DuckDB Python client for testing
+
+The `make configure` step will automatically install DuckDB. This means that after running `make configure` and `make debug`, running the 
+tests is as simple as `make test_debug`.
+
+To test your extension against 
 
 ### Step 1
 - creates a local python3 venv
