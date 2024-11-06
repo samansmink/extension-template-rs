@@ -241,6 +241,7 @@ endif
 
 configure_ci: $(CONFIGURE_CI_STEP)
 
+# Because the configure_ci may differ from configure, we don't automatically run configure on make build, this makes the error a bit nicer
 check_configure:
 	$(PYTHON_BIN) -c "import os; assert os.path.exists('build/platform.txt'), 'The configure step appears to not be run. Please try running make configure'"
 	$(PYTHON_BIN) -c "import os; assert os.path.exists('venv'), 'The configure step appears to not be run. Please try running make configure'"
