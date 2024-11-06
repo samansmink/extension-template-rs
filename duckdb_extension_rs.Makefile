@@ -56,11 +56,13 @@ EXTENSION_FILENAME=$(EXTENSION_NAME).duckdb_extension
 platform: build/platform
 
 # Either autodetect or use the provided value
+PLATFORM_TARGET ?=
 ifeq ($(DUCKDB_PLATFORM),)
     PLATFORM_TARGET=platform_autodetect
 else
 	PLATFORM_TARGET=platform_override
 endif
+
 build/platform: $(PLATFORM_TARGET)
 
 # (Don't call directly) autodetects the platform using the DuckDB installed in the venv
