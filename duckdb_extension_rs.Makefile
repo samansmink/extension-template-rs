@@ -43,6 +43,7 @@ ifeq ($(DUCKDB_VERSION),)
 	DUCKDB_VERSION = v0.0.1
 endif
 
+# TODO: extension_tag from github actions is not used
 ifeq ($(EXTENSION_VERSION),)
 	EXTENSION_VERSION = v0.0.1
 endif
@@ -170,7 +171,7 @@ ifeq ($(LINUX_CI_IN_DOCKER),1)
 	SKIP_TESTS=1
 endif
 
-ifeq ($(DUCKDB_PLATFORM),linux_amd64_gcc4)
+ifeq ($(DUCKDB_PLATFORM),linux_amd64)
 	SKIP_TESTS=1
 endif
 

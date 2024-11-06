@@ -301,14 +301,14 @@ jobs:
           restore-keys: |
             ccache-extension-distribution-${{ matrix.duckdb_arch }}-
 
-      - name: Run configure CI (outside Docker)
+      - name: Run configure (outside Docker)
         shell: bash
         env:
           DUCKDB_GIT_VERSION: ${{ inputs.duckdb_version }}
         run: |
           make configure_ci
 
-      - name: Run configure CI (inside Docker)
+      - name: Run configure (inside Docker)
         shell: bash
         run: |
           docker run --env-file=docker_env.txt -v `pwd`:/duckdb_build_dir -v `pwd`/ccache_dir:/ccache_dir duckdb/${{ matrix.duckdb_arch }} make configure_ci
@@ -455,7 +455,7 @@ jobs:
           echo "CPPFLAGS=-I/opt/homebrew/opt/libomp/include" >> $GITHUB_ENV
           echo "CXXFLAGS=-I/opt/homebrew/opt/libomp/include" >> $GITHUB_ENV
 
-      - name: Run configure CI
+      - name: Run configure
         shell: bash
         env:
           DUCKDB_GIT_VERSION: ${{ inputs.duckdb_version }}
@@ -598,7 +598,7 @@ jobs:
           vcpkgGitCommitId: ${{ inputs.vcpkg_commit }}
           vcpkgGitURL: ${{ inputs.vcpkg_url }}
 
-      - name: Run configure CI
+      - name: Run configure
         shell: bash
         env:
           DUCKDB_PLATFORM: ${{ matrix.duckdb_arch }}
@@ -718,7 +718,7 @@ jobs:
         with:
           key: ${{ github.job }}-${{ matrix.duckdb_arch }}
 
-      - name: Run configure CI
+      - name: Run configure
         shell: bash
         env:
           DUCKDB_GIT_VERSION: ${{ inputs.duckdb_version }}
