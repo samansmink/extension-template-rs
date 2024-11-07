@@ -16,6 +16,7 @@ tooling to make life a little easier and to be able to share CI/CD infrastructur
 - python3
 - python3-venv
 - [Make](https://www.gnu.org/software/make)
+- git
 
 Installing these dependencies will vary per platform:
 - For Linux, these come generally pre-installed or are available through the distro-specific package manager.
