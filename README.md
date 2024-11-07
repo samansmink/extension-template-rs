@@ -1,5 +1,13 @@
 # DuckDB Rust extension template
-This is an experimental template for Rust based extensions based on the C Extension API of DuckDB.
+This is an **experimental** template for Rust based extensions based on the C Extension API of DuckDB. The goal is to 
+turn this eventually into a stable basis for pure-Rust DuckDB extensions that can be submitted to the Community extensions
+repository
+
+Features:
+- No DuckDB build required
+- No C++ or C code required
+- CI/CD chain preconfigured
+- (Coming soon) Works with community extensions
 
 ## Cloning
 
@@ -53,6 +61,27 @@ make test_debug
 or for the *release* build:
 ```shell
 make test_release
+```
+
+### Version switching 
+Testing with different DuckDB versions is really simple:
+
+First, run 
+```
+make clean_all
+```
+to ensure the previous `make configure` step is deleted.
+
+Then, run 
+```
+DUCKDB_TEST_VERSION=v1.1.2 make configure
+```
+to select a different duckdb version to test with
+
+Finally, build and test with 
+```
+make debug
+make test_debug
 ```
 
 ### Known issues
