@@ -175,7 +175,7 @@ build_extension_with_metadata_debug: check_configure
 			-dv $(MINIMUM_DUCKDB_VERSION) \
 			-evf configure/extension_version.txt \
 			-pf configure/platform.txt
-	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/debug/$(EXTENSION_FILENAME)', 'build/debug/extension/$(EXTENSION_FILENAME)')"
+	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/debug/$(EXTENSION_FILENAME)', 'build/debug/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
 build_extension_with_metadata_release: check_configure
 	$(PYTHON_VENV_BIN) extension-ci-tools/scripts/append_extension_metadata.py \
@@ -185,7 +185,7 @@ build_extension_with_metadata_release: check_configure
 			-dv $(MINIMUM_DUCKDB_VERSION) \
 			-evf configure/extension_version.txt \
 			-pf configure/platform.txt
-	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_FILENAME)')"
+	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_FILENAME)/$(EXTENSION_FILENAME)')"
 
 #############################################
 ### Python
