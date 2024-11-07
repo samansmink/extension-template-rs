@@ -55,6 +55,21 @@ or for the *release* build:
 make test_release
 ```
 
+## Debugging
+
+Start duckdb, allowing unsigned extensions
+
+```shell
+duckdb -unsigned
+```
+
+Load the extension
+
+```shell
+load './build/release/extension/rusty_quack/rusty_quack.duckdb_extension';
+from rusty_quack('Hello');
+```
+
 ### Known issues
 This is a bit of a footgun, but the extensions produced by this template may (or may not) be broken on windows on python3.11 
 with the following error on extension load:
