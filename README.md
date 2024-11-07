@@ -9,19 +9,19 @@ Clone the repo with submodules
 git clone --recurse-submodules <repo>
 ```
 
-### Dependencies
+## Dependencies
 In principle, these extensions can be compiled with the Rust toolchain alone. However, this template relies on some additional
 tooling to make life a little easier and to be able to share CI/CD infrastructure with extension templates for other languages:
 
-- python3
-- python3-venv
+- Python3
+- Python3-venv
 - [Make](https://www.gnu.org/software/make)
-- git
+- Git
 
 Installing these dependencies will vary per platform:
 - For Linux, these come generally pre-installed or are available through the distro-specific package manager.
-- For MacOS, [homebrew](https://formulae.brew.sh/) is your answer.
-- For Windows, [chocolatey](https://community.chocolatey.org/) comes recommended.
+- For MacOS, [homebrew](https://formulae.brew.sh/).
+- For Windows, [chocolatey](https://community.chocolatey.org/).
 
 ## Building
 After installing the dependencies, building is a two-step process. Firstly run:

@@ -159,6 +159,8 @@ set_MINIMUM_DUCKDB_VERSION: nop
 
 set_duckdb_tag: nop
 
+set_duckdb_version: nop
+
 output_distribution_matrix:
 	cat extension-ci-tools/config/distribution_matrix.json
 
