@@ -2,7 +2,6 @@
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-# TODO: these values are currently duplicated in lib.rs. Fetching them from the env variables in the proc macro should fix this
 EXTENSION_NAME=rusty_quack
 MINIMUM_DUCKDB_VERSION=v0.0.1
 
