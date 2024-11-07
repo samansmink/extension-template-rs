@@ -10,10 +10,7 @@
 #   LINUX_CI_IN_DOCKER :
 #   SKIP_TESTS :
 
-# TODO clean this up
-.PHONY: clean test_debug test_release test debug release install_dev_dependencies all check_configure platform_autodetect platform_override build_extension_with_metadata_debug build_extension_with_metadata_release
-
-.PHONY: platform extension_version
+.PHONY: platform extension_version test_extension_release test_extension_debug test_extension_release_internal test_extension_debug_internal tests_skipped clean_build clean_configure nop set_duckdb_tag set_duckdb_version output_distribution_matrix venv configure_ci check_configure
 
 #############################################
 ### Platform dependent config
@@ -103,9 +100,6 @@ ifneq ($(DUCKDB_GIT_VERSION),)
 	DUCKDB_INSTALL_VERSION===$(DUCKDB_GIT_VERSION)
 endif
 
-# Main tests
-test: test_release
-
 TEST_RELEASE_TARGET=test_extension_release_internal
 TEST_DEBUG_TARGET=test_extension_debug_internal
 
@@ -155,8 +149,6 @@ clean_configure:
 nop:
 	@echo "NOP"
 
-set_MINIMUM_DUCKDB_VERSION: nop
-
 set_duckdb_tag: nop
 
 set_duckdb_version: nop
@@ -185,7 +177,7 @@ build_extension_with_metadata_release: check_configure
 			-dv $(MINIMUM_DUCKDB_VERSION) \
 			-evf configure/extension_version.txt \
 			-pf configure/platform.txt
-	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_FILENAME)/$(EXTENSION_FILENAME)')"
+	$(PYTHON_VENV_BIN) -c "import shutil;shutil.copyfile('build/release/$(EXTENSION_FILENAME)', 'build/release/extension/$(EXTENSION_NAME)/$(EXTENSION_FILENAME)')"
 
 #############################################
 ### Python
