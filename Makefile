@@ -2,6 +2,7 @@
 
 PROJ_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+# TODO: these values are currently duplicated in lib.rs. There's a PR open in duckdb-rs that fixes this
 EXTENSION_NAME=rusty_quack
 MINIMUM_DUCKDB_VERSION=v0.0.1
 
